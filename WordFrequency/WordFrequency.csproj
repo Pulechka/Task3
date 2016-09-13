@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9641723C-2ECD-4068-8AC3-D990948A9EB1}</ProjectGuid>
+    <ProjectGuid>{D034ED07-5FA0-4A19-BCE4-BCE4E8EF8AF5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lost</RootNamespace>
@@ -43,10 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Person.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RoundList.cs" />
+    <Compile Include="SortParameter.cs" />
+    <Compile Include="WordsCounter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
