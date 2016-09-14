@@ -57,12 +57,29 @@ namespace DynamicArrayTask
 
             try
             {
-                arr1.Insert(256, 11);
+                arr1.Insert(3, 256);
+                Console.WriteLine("arr1.Insert(3,256)");
+                arr1.Show();
+                Console.WriteLine();
+
+                arr2.Insert(0, -10);
+                Console.WriteLine("arr2.Insert(0,-10)");
+                arr2.Show();
+                Console.WriteLine();
+
+                arr2[2] = 1000;
+                Console.WriteLine("arr2[2] = 1000)");
+                arr2.Show();
+                Console.WriteLine();
+
+                Console.WriteLine("arr2[1] = "+arr2[1]);
             }
             catch (ArgumentOutOfRangeException ex)
             {
                 Console.WriteLine(ex.Message);
             }
+
+
         }
     }
 }

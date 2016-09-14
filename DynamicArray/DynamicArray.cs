@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DynamicArrayTask
 {
-    public class DynamicArray<T>
+    public class DynamicArray<T> : IEnumerable<T>
     {
         private T[] data;
         private int length;
@@ -122,14 +123,30 @@ namespace DynamicArrayTask
         }
 
 
-        public bool Insert(T item, int index)
+        public bool Insert(int index, T item)
         {
-            if (index <= length || index < 0)
+            if (index > length || index < 0)
                 throw new ArgumentOutOfRangeException("index");
 
+            if (length == Capacity) //raise capacity
+            {
+                T[] temp = data;
+                data = new T[Capacity * 2];
+                temp.CopyTo(data, 0);
+            }
 
-            return false;
+            for (int i = length; i > index; i--)
+            {
+                data[i] = data[i - 1];
+            }
+            data[index] = item;
+            length++;
+
+            return true;
+
+            //когда возвращать false ?????????????????????????????????????????????????????????????????????
         }
+
 
         public void Show()
         {
@@ -140,6 +157,33 @@ namespace DynamicArrayTask
                 Console.Write($"{item} ");
             }
             Console.WriteLine();
+        }
+
+
+        public T this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= length)
+                    throw new ArgumentOutOfRangeException("index");
+                return data[index];
+            }
+            set
+            {
+                if (index < 0 || index >= length)
+                    throw new ArgumentOutOfRangeException("index");
+                data[index] = value;
+            }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return (IEnumerator<T>)data.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 }
