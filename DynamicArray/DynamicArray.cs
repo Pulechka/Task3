@@ -1,46 +1,69 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicArrayTask
 {
-    public class DynamicArray<T> : IEnumerable<T>
+    public class DynamicArray<T> : IEnumerable<T>, ICloneable
     {
-        private T[] data;
-        private int length;
+        protected T[] data;
+        protected int count;
 
         public int Capacity
         {
             get { return data.Length; }
+            set
+            {
+                if (value <=0)
+                    throw new ArgumentOutOfRangeException("capacity", "Capacity should be positive");
+                if (value > data.Length) //copy all values
+                {
+                    T[] temp = new T[count];
+                    data.CopyTo(temp, 0);
+                    data = new T[value];
+                    temp.CopyTo(data, 0);
+                }
+                else // cut values
+                {
+                    T[] temp = new T[value];
+                    for (int i = 0; i < value; i++)
+                    {
+                        temp[i] = data[i];
+                    }
+                    data = new T[value];
+                    temp.CopyTo(data, 0);
+                    count = data.Length;
+                }
+            }
         }
 
 
-        public int Length
+        public int Count
         {
-            get { return length; }
+            get { return count; }
         }
 
 
         public DynamicArray()
         {
             data = new T[8];
-            length = 0;
+            count = 0;
         }
 
 
         public DynamicArray(int capacity)
         {
+            if (capacity <= 0)
+                throw new ArgumentOutOfRangeException("capacity", "Capacity should be positive");
             data = new T[capacity];
-            length = 0;
+            count = 0;
         }
 
 
         public DynamicArray(IEnumerable<T> col)
         {
             IEnumerator<T> enumerator = col.GetEnumerator();
-
+            
             int count = 0;
             while (enumerator.MoveNext())
                 count++;
@@ -55,21 +78,21 @@ namespace DynamicArrayTask
                 enumerator.MoveNext();
             }
 
-            length = data.Length;
+            this.count = data.Length;
         }
 
 
         public void Add(T newItem)
         {
-            if (length == Capacity) //raise capacity
+            if (count == Capacity) //raise capacity
             {
                 T[] temp = data;
                 data = new T[Capacity * 2];
                 temp.CopyTo(data, 0);
             }
 
-            data[length] = newItem;
-            length++;
+            data[count] = newItem;
+            count++;
         }
 
         public void AddRange(IEnumerable<T> col)
@@ -80,10 +103,10 @@ namespace DynamicArrayTask
             while (enumerator.MoveNext())
                 count++;
 
-            if (Capacity < length + count) //raise capacity
+            if (Capacity < this.count + count) //raise capacity
             {
                 int newCapacity = Capacity * 2;
-                while (newCapacity < length + count)
+                while (newCapacity < this.count + count)
                     newCapacity *= 2;
 
                 T[] temp = data;
@@ -93,29 +116,29 @@ namespace DynamicArrayTask
 
             enumerator.Reset();
             enumerator.MoveNext();
-            for (int i = length; i < count+length; i++)
+            for (int i = this.count; i < count+ this.count; i++)
             {
                 data[i] = enumerator.Current;
                 enumerator.MoveNext();
             }
 
-            length += count;
+            this.count += count;
         }
 
 
         public bool Remove(T item)
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (data[i].Equals(item))
                 {
-                    for (int j = i; j < length; j++)
+                    for (int j = i; j < count; j++)
                     {
                         data[j] = data[j + 1];
 
                     }
-                    data[length] = default(T);
-                    length--;
+                    data[count] = default(T);
+                    count--;
                     return true;
                 }
             }
@@ -125,22 +148,22 @@ namespace DynamicArrayTask
 
         public bool Insert(int index, T item)
         {
-            if (index > length || index < 0)
+            if (index > count || index < 0)
                 throw new ArgumentOutOfRangeException("index");
 
-            if (length == Capacity) //raise capacity
+            if (count == Capacity) //raise capacity
             {
                 T[] temp = data;
                 data = new T[Capacity * 2];
                 temp.CopyTo(data, 0);
             }
 
-            for (int i = length; i > index; i--)
+            for (int i = count; i > index; i--)
             {
                 data[i] = data[i - 1];
             }
             data[index] = item;
-            length++;
+            count++;
 
             return true;
 
@@ -150,11 +173,14 @@ namespace DynamicArrayTask
 
         public void Show()
         {
-            Console.WriteLine($"Length = {length}");
+            Console.WriteLine($"Count = {Count}");
             Console.WriteLine($"Capacity = {Capacity}");
-            foreach (var item in data)
+            for (int i = 0; i < data.Length; i++)
             {
-                Console.Write($"{item} ");
+                if (i < Count)
+                    Console.Write($"{data[i]} ");
+                else
+                    Console.Write("x ");
             }
             Console.WriteLine();
         }
@@ -164,26 +190,95 @@ namespace DynamicArrayTask
         {
             get
             {
-                if (index < 0 || index >= length)
+                if (index >= count)
                     throw new ArgumentOutOfRangeException("index");
-                return data[index];
+                else if (index < 0)
+                    return data[count + index];
+                else
+                    return data[index];
             }
             set
             {
-                if (index < 0 || index >= length)
+                if (index >= count)
                     throw new ArgumentOutOfRangeException("index");
-                data[index] = value;
+                else if (index < 0)
+                    data[count + index] = value;
+                else
+                    data[index] = value;
             }
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public virtual IEnumerator<T> GetEnumerator()
         {
-            return (IEnumerator<T>)data.GetEnumerator();
+            return new DynamicArrayEnumerator<T>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
+        }
+
+        public object Clone()
+        {
+            DynamicArray<T> copy = new DynamicArray<T>();
+            copy.data = new T[Capacity];
+            data.CopyTo(copy.data,0);
+            copy.count = count;
+            return copy;
+        }
+
+        public T[] ToArray()
+        {
+            T[] resultArray = new T[count];
+            for (int i = 0; i < count; i++)
+            {
+                resultArray[i] = data[i];
+            }
+            return resultArray;
+        }
+    }
+
+
+    public class DynamicArrayEnumerator<T> : IEnumerator<T>
+    {
+        protected int position = -1;
+        protected T[] data;
+        protected int count;
+
+        public DynamicArrayEnumerator(DynamicArray<T> dataArray)
+        {
+            data = dataArray.ToArray();
+            count = dataArray.Count;
+        }
+
+        public T Current
+        {
+            get
+            {
+                try { return data[position]; }
+                catch(IndexOutOfRangeException) { throw new InvalidOperationException(); }
+            }
+        }
+
+        object IEnumerator.Current
+        {
+            get
+            {
+                return Current;
+            }
+        }
+
+        public void Dispose() { }
+
+        public virtual bool MoveNext()
+        {
+            position++;
+            return (position < count);
+        }
+
+        public void Reset()
+        {
+            position = -1;
         }
     }
 }

@@ -1,24 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lost
 {
-    public class RoundList : IEnumerable<Person>
+    public class RoundList 
     {
-        IEnumerator<Person> en;
+        private List<Person> persons;
+        private int position;
 
-        public IEnumerator<Person> GetEnumerator()
+        RoundList()
         {
-            return en;
+            persons = new List<Person>();
+            position = -1;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        //public void MoveNext()
+        //{
+        //    position++;
+        //}
+
+        public Person Current
         {
-            throw new NotImplementedException();
+            get { return persons[position]; }
+        }
+
+        public void RemoveNext()
+        {
+            persons.RemoveAt(position++);
         }
     }
 }

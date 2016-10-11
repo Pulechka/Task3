@@ -18,10 +18,10 @@ namespace Lost
 
         public void Count()
         {
-            string[] words = text.Split(new char[] { '.', ' ', ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var separators = GetSeparators(text);
+            string[] words = text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
             wordsFrequency = new Dictionary<string, int>();
-
             foreach (var word in words)
             {
                 if (wordsFrequency.ContainsKey(word.ToLower()))
@@ -31,6 +31,17 @@ namespace Lost
             }
         }
 
+
+        private char[] GetSeparators(string text)
+        {
+            HashSet<char> separators = new HashSet<char>();
+            foreach (var ch in text)
+            {
+                if (char.IsSeparator(ch) || char.IsPunctuation(ch))
+                    separators.Add(ch);
+            }
+            return separators.ToArray();
+        }
 
         public void ShowWordsFrequency(SortParameter sort)
         {

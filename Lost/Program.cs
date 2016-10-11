@@ -9,23 +9,29 @@ namespace Lost
     {
         static void Main(string[] args)
         {
-            RoundList personsRound = new RoundList();
+            int N = 0;
 
-            int count = 15;
-
-            //for (int i = 1; i <= count; i++)
-            //    personsRound.AddLast(new Person(i));
-
-            //while(personsRound.Count > 1)
+            bool tryInput = true;
+            while (tryInput)
             {
-
+                Console.Write("Input N: ");
+                tryInput = !int.TryParse(Console.ReadLine(), out N);
             }
 
-
-            foreach (var person in personsRound)
+            Queue<Person> persons = new Queue<Person>();
+            for (int i = 1; i <=N; i++)
             {
-                Console.WriteLine(person.Number);
+                persons.Enqueue(new Person(i));
             }
+
+            while (persons.Count >1)
+            {
+                persons.Enqueue(persons.Dequeue());
+                persons.Dequeue();
+            }
+            
+            Console.WriteLine($"Last person: {persons.Dequeue()}");
+
         }
 
     }
