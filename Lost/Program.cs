@@ -9,30 +9,42 @@ namespace Lost
     {
         static void Main(string[] args)
         {
-            int N = 0;
+            int n = GetN();
+            Queue<Person> persons = new Queue<Person>();
+            FillQueue(persons, n);           
+            Console.WriteLine($"Last person: {GetLastPerson(persons)}");
+        }
+
+        private static int GetN()
+        {
+            int n = 0;
 
             bool tryInput = true;
             while (tryInput)
             {
                 Console.Write("Input N: ");
-                tryInput = !int.TryParse(Console.ReadLine(), out N);
+                tryInput = !int.TryParse(Console.ReadLine(), out n);
             }
+            return n;
+        }
 
-            Queue<Person> persons = new Queue<Person>();
-            for (int i = 1; i <=N; i++)
+        private static void FillQueue(Queue<Person> queue, int n)
+        {
+            for (int i = 1; i <= n; i++)
             {
-                persons.Enqueue(new Person(i));
+                queue.Enqueue(new Person(i));
             }
+        }
 
-            while (persons.Count >1)
+
+        private static Person GetLastPerson(Queue<Person> persons)
+        {
+            while (persons.Count > 1)
             {
                 persons.Enqueue(persons.Dequeue());
                 persons.Dequeue();
             }
-            
-            Console.WriteLine($"Last person: {persons.Dequeue()}");
-
+            return persons.Dequeue();
         }
-
     }
 }
